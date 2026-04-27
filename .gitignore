@@ -8,6 +8,11 @@ local.properties
 # Log/OS Files
 *.log
 
+.dart_tool/
+*.lock
+
+.vscode/
+
 # Android Studio generated files and folders
 captures/
 .externalNativeBuild/
