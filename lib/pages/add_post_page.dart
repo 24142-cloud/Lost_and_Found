@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/post_form.dart';
 
+
 class AddPostPage extends StatelessWidget {
   const AddPostPage({super.key});
 
@@ -13,6 +14,7 @@ class AddPostPage extends StatelessWidget {
       body: const Padding(
         padding: EdgeInsets.all(16),
         child: PostForm(),
+
       ),
     );
   }
