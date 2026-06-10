@@ -21,6 +21,15 @@ dependencies:
   crypto: ^3.0.6
   flutter_localizations:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/images/Symbol.png"
+  ios: true
+  adaptive_icon_background: "#005F6A"
+  adaptive_icon_foreground: "assets/images/Symbol.png"
 
 dev_dependencies:
   flutter_test:
@@ -29,3 +38,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/
