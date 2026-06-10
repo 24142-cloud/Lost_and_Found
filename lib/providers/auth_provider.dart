@@ -48,18 +48,12 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> login({required String email, required String password}) async {
     _setLoading(true);
     _clearError();
 
     try {
-      await _authService.login(
-        email: email,
-        password: password,
-      );
+      await _authService.login(email: email, password: password);
       _appUser = await _authService.getCurrentUserData();
       notifyListeners();
       return true;
@@ -78,11 +72,14 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> loadCurrentUser() async {
     _setLoading(true);
+    _clearError();
+
     try {
       _appUser = await _authService.getCurrentUserData();
       notifyListeners();
-    } catch (_) {
-      // تجاهل مؤقتًا
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
     } finally {
       _setLoading(false);
     }

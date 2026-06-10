@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lost_and_found/core/constants/firestore_keys.dart';
 import 'package:lost_and_found/models/user_model.dart';
 
@@ -17,9 +18,11 @@ class AuthService {
     required String password,
     String phone = '',
   }) async {
+    final trimmedName = name.trim();
+
     final userCredential = await _auth.createUserWithEmailAndPassword(
-      email: email.trim(),
-      password: password.trim(),
+      email: email,
+      password: password,
     );
 
     final user = userCredential.user;
@@ -27,20 +30,28 @@ class AuthService {
       throw Exception('User creation failed.');
     }
 
-    await user.updateDisplayName(name);
+    try {
+      await user.updateDisplayName(trimmedName);
 
-    final userModel = UserModel(
-      uid: user.uid,
-      name: name,
-      email: email.trim(),
-      phone: phone,
-      profileImage: '',
-    );
+      final userModel = UserModel(
+        uid: user.uid,
+        name: trimmedName,
+        email: email,
+        phone: phone.trim(),
+        profileImage: '',
+      );
 
-    await _firestore
-        .collection(FirestoreKeys.users)
-        .doc(user.uid)
-        .set(userModel.toMap());
+      await _firestore
+          .collection(FirestoreKeys.users)
+          .doc(user.uid)
+          .set(userModel.toMap());
+    } catch (_) {
+      try {
+        await user.delete();
+      } catch (_) {}
+
+      throw Exception('Failed to create user profile. Please try again.');
+    }
 
     return userCredential;
   }
@@ -49,10 +60,31 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    return await _auth.signInWithEmailAndPassword(
-      email: email.trim(),
-      password: password.trim(),
+    debugPrint('[AuthService] Login email: $email');
+    debugPrint(
+      '[AuthService] Current auth user before login: '
+      '${_formatUser(_auth.currentUser)}',
     );
+
+    try {
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      debugPrint(
+        '[AuthService] Current auth user after login: '
+        '${_formatUser(_auth.currentUser)}',
+      );
+      return credential;
+    } on FirebaseAuthException catch (e) {
+      debugPrint('[AuthService] Login failed code: ${e.code}');
+      debugPrint('[AuthService] Login failed message: ${e.message}');
+      debugPrint(
+        '[AuthService] Current auth user after login failure: '
+        '${_formatUser(_auth.currentUser)}',
+      );
+      rethrow;
+    }
   }
 
   Future<void> logout() async {
@@ -71,5 +103,10 @@ class AuthService {
     if (!doc.exists || doc.data() == null) return null;
 
     return UserModel.fromMap(doc.data()!);
+  }
+
+  String _formatUser(User? user) {
+    if (user == null) return 'null';
+    return 'uid=${user.uid}, email=${user.email}';
   }
 }

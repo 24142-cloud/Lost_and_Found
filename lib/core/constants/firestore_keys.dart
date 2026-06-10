@@ -12,9 +12,15 @@ class FirestoreKeys {
   static const title = 'title';
   static const description = 'description';
   static const type = 'type';
+  static const postType = 'postType';
+  static const category = 'category';
   static const imageUrl = 'imageUrl';
   static const location = 'location';
+  static const wilaya = 'wilaya';
+  static const district = 'district';
+  static const locationDescription = 'locationDescription';
   static const contact = 'contact';
+  static const phoneNumber = 'phoneNumber';
   static const userId = 'userId';
   static const userName = 'userName';
   static const status = 'status';

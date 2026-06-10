@@ -8,11 +8,13 @@
       "version": "1.0.0+1",
       "dependencies": [
         "cloud_firestore",
+        "crypto",
         "cupertino_icons",
         "firebase_auth",
         "firebase_core",
-        "firebase_storage",
         "flutter",
+        "flutter_localizations",
+        "http",
         "image_picker",
         "provider"
       ],
@@ -47,6 +49,32 @@
       ]
     },
     {
+      "name": "flutter_localizations",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter",
+        "intl",
+        "path"
+      ]
+    },
+    {
+      "name": "crypto",
+      "version": "3.0.7",
+      "dependencies": [
+        "typed_data"
+      ]
+    },
+    {
+      "name": "http",
+      "version": "1.6.0",
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
+      ]
+    },
+    {
       "name": "image_picker",
       "version": "1.2.1",
       "dependencies": [
@@ -67,18 +95,6 @@
         "collection",
         "flutter",
         "nested"
-      ]
-    },
-    {
-      "name": "firebase_storage",
-      "version": "13.3.0",
-      "dependencies": [
-        "firebase_core",
-        "firebase_core_platform_interface",
-        "firebase_storage_platform_interface",
-        "firebase_storage_web",
-        "flutter",
-        "mime"
       ]
     },
     {
@@ -223,6 +239,45 @@
       ]
     },
     {
+      "name": "intl",
+      "version": "0.20.2",
+      "dependencies": [
+        "clock",
+        "meta",
+        "path"
+      ]
+    },
+    {
+      "name": "typed_data",
+      "version": "1.4.0",
+      "dependencies": [
+        "collection"
+      ]
+    },
+    {
+      "name": "web",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
+      "name": "http_parser",
+      "version": "4.1.2",
+      "dependencies": [
+        "collection",
+        "source_span",
+        "string_scanner",
+        "typed_data"
+      ]
+    },
+    {
+      "name": "async",
+      "version": "2.13.1",
+      "dependencies": [
+        "collection",
+        "meta"
+      ]
+    },
+    {
       "name": "image_picker_windows",
       "version": "0.2.2",
       "dependencies": [
@@ -295,39 +350,6 @@
       "version": "1.0.0",
       "dependencies": [
         "flutter"
-      ]
-    },
-    {
-      "name": "mime",
-      "version": "2.0.0",
-      "dependencies": []
-    },
-    {
-      "name": "firebase_storage_web",
-      "version": "3.11.5",
-      "dependencies": [
-        "_flutterfire_internals",
-        "async",
-        "firebase_core",
-        "firebase_core_web",
-        "firebase_storage_platform_interface",
-        "flutter",
-        "flutter_web_plugins",
-        "http",
-        "meta",
-        "web"
-      ]
-    },
-    {
-      "name": "firebase_storage_platform_interface",
-      "version": "5.2.20",
-      "dependencies": [
-        "_flutterfire_internals",
-        "collection",
-        "firebase_core",
-        "flutter",
-        "meta",
-        "plugin_platform_interface"
       ]
     },
     {
@@ -422,14 +444,6 @@
       "dependencies": []
     },
     {
-      "name": "async",
-      "version": "2.13.1",
-      "dependencies": [
-        "collection",
-        "meta"
-      ]
-    },
-    {
       "name": "leak_tracker_testing",
       "version": "3.0.2",
       "dependencies": [
@@ -505,16 +519,6 @@
       ]
     },
     {
-      "name": "http",
-      "version": "1.6.0",
-      "dependencies": [
-        "async",
-        "http_parser",
-        "meta",
-        "web"
-      ]
-    },
-    {
       "name": "cross_file",
       "version": "0.3.5+2",
       "dependencies": [
@@ -541,8 +545,8 @@
       ]
     },
     {
-      "name": "web",
-      "version": "1.1.1",
+      "name": "mime",
+      "version": "2.0.0",
       "dependencies": []
     },
     {
@@ -571,26 +575,9 @@
       ]
     },
     {
-      "name": "http_parser",
-      "version": "4.1.2",
-      "dependencies": [
-        "collection",
-        "source_span",
-        "string_scanner",
-        "typed_data"
-      ]
-    },
-    {
       "name": "vm_service",
       "version": "15.1.0",
       "dependencies": []
-    },
-    {
-      "name": "typed_data",
-      "version": "1.4.0",
-      "dependencies": [
-        "collection"
-      ]
     }
   ],
   "configVersion": 1

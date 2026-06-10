@@ -1,19 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lost_and_found/core/constants/app_colors.dart';
+import 'package:lost_and_found/core/localization/app_localizations.dart';
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/login');
-    });
+  State<SplashPage> createState() => _SplashPageState();
+}
 
-    return const Scaffold(
+class _SplashPageState extends State<SplashPage> {
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthState();
+  }
+
+  Future<void> _checkAuthState() async {
+    final user = await FirebaseAuth.instance.authStateChanges().first;
+
+    if (!mounted) return;
+
+    Navigator.pushReplacementNamed(context, user == null ? '/login' : '/home');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+
+    return Scaffold(
       body: Center(
-        child: Text(
-          'Splash Page',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l.text('splash'),
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                color: AppColors.secondary,
+                fontSize: 44,
+                letterSpacing: 0,
+              ),
+            ),
+            const SizedBox(height: 14),
+            const SizedBox.square(
+              dimension: 28,
+              child: CircularProgressIndicator(strokeWidth: 2.8),
+            ),
+          ],
         ),
       ),
     );

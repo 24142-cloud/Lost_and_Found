@@ -1,14 +1,20 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:lost_and_found/core/constants/firestore_keys.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lost_and_found/core/services/cloudinary_service.dart';
 import 'package:lost_and_found/core/services/post_service.dart';
-import 'package:lost_and_found/core/services/storage_service.dart';
 import 'package:lost_and_found/models/post_model.dart';
 
 class PostProvider extends ChangeNotifier {
-  final PostService _postService = PostService();
-  final StorageService _storageService = StorageService();
+  PostProvider({
+    PostRepository? postService,
+    ImageUploadRepository? imageUploadService,
+  }) : _postService = postService ?? PostService(),
+       _imageUploadService = imageUploadService ?? CloudinaryService();
+
+  final PostRepository _postService;
+  final ImageUploadRepository _imageUploadService;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -26,7 +32,7 @@ class PostProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      _posts = await _postService.getPosts();
+      await _loadPosts();
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
@@ -56,14 +62,7 @@ class PostProvider extends ChangeNotifier {
     _clearError();
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        _myPosts = [];
-        notifyListeners();
-        return;
-      }
-
-      _myPosts = await _postService.getMyPosts(user.uid);
+      await _loadMyPosts();
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
@@ -76,44 +75,128 @@ class PostProvider extends ChangeNotifier {
   Future<bool> addPost({
     required String title,
     required String description,
+    required String category,
     required String type,
     required String location,
+    required String wilaya,
+    required String district,
+    required String locationDescription,
     required String contact,
     required String userId,
     required String userName,
     required String date,
-    File? imageFile,
+    XFile? imageFile,
   }) async {
     _setLoading(true);
     _clearError();
+    var uploadedImageUrl = '';
+    var postCreated = false;
 
     try {
-      String imageUrl = '';
+      final currentUid = _currentFirebaseUid();
+      debugPrint('PostProvider.addPost currentUser.uid=$currentUid');
+      debugPrint('PostProvider.addPost saved userId=$userId');
 
       if (imageFile != null) {
-        imageUrl = await _storageService.uploadImage(imageFile);
+        debugPrint('Selected image: ${imageFile.path}');
+        uploadedImageUrl = await _imageUploadService.uploadImage(imageFile);
       }
 
       final post = PostModel(
         id: '',
         title: title,
         description: description,
+        category: category,
         type: type,
-        imageUrl: imageUrl,
+        imageUrl: uploadedImageUrl,
         location: location,
+        wilaya: wilaya,
+        district: district,
+        locationDescription: locationDescription,
         contact: contact,
         userId: userId,
         userName: userName,
         status: 'open',
-        createdAt: DateTime.now(),
+        createdAt: null,
         date: date,
       );
 
       await _postService.addPost(post);
-      await fetchPosts();
-      await fetchMyPosts();
+      debugPrint('Firestore post created');
+      postCreated = true;
+      await _refreshPostsAfterWrite(fallbackUserId: userId);
+      notifyListeners();
       return true;
     } catch (e) {
+      if (!postCreated && uploadedImageUrl.isNotEmpty) {
+        await _tryDeleteImage(uploadedImageUrl);
+      }
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> updatePost({
+    required String postId,
+    required String title,
+    required String description,
+    required String category,
+    required String type,
+    required String location,
+    required String wilaya,
+    required String district,
+    required String locationDescription,
+    required String contact,
+    required String status,
+    required String date,
+    String imageUrl = '',
+    XFile? imageFile,
+  }) async {
+    _setLoading(true);
+    _clearError();
+    var uploadedImageUrl = '';
+
+    try {
+      var nextImageUrl = imageUrl;
+
+      if (imageFile != null) {
+        debugPrint('Selected image: ${imageFile.path}');
+        uploadedImageUrl = await _imageUploadService.uploadImage(imageFile);
+        nextImageUrl = uploadedImageUrl;
+      }
+
+      await _postService.updatePost(postId, {
+        FirestoreKeys.title: title,
+        FirestoreKeys.description: description,
+        FirestoreKeys.type: type,
+        FirestoreKeys.postType: type,
+        FirestoreKeys.category: category,
+        FirestoreKeys.imageUrl: nextImageUrl,
+        FirestoreKeys.location: location,
+        FirestoreKeys.wilaya: wilaya,
+        FirestoreKeys.district: district,
+        FirestoreKeys.locationDescription: locationDescription,
+        FirestoreKeys.contact: contact,
+        FirestoreKeys.phoneNumber: contact,
+        FirestoreKeys.status: status,
+        FirestoreKeys.date: date,
+      });
+      debugPrint('Firestore post updated');
+
+      if (uploadedImageUrl.isNotEmpty && imageUrl.isNotEmpty) {
+        await _tryDeleteImage(imageUrl);
+      }
+
+      await _refreshPostsAfterWrite();
+      notifyListeners();
+      return true;
+    } catch (e) {
+      if (uploadedImageUrl.isNotEmpty) {
+        await _tryDeleteImage(uploadedImageUrl);
+      }
       _errorMessage = e.toString();
       notifyListeners();
       return false;
@@ -127,7 +210,13 @@ class PostProvider extends ChangeNotifier {
     _clearError();
 
     try {
+      final post = _findCachedPost(postId);
       await _postService.deletePost(postId);
+
+      if (post?.imageUrl.isNotEmpty ?? false) {
+        await _tryDeleteImage(post!.imageUrl);
+      }
+
       _posts.removeWhere((post) => post.id == postId);
       _myPosts.removeWhere((post) => post.id == postId);
       notifyListeners();
@@ -136,6 +225,59 @@ class PostProvider extends ChangeNotifier {
       notifyListeners();
     } finally {
       _setLoading(false);
+    }
+  }
+
+  Future<void> _loadPosts() async {
+    _posts = await _postService.getPosts();
+  }
+
+  Future<void> _loadMyPosts({String? fallbackUserId}) async {
+    final currentUid = _currentFirebaseUid();
+    final userId = fallbackUserId ?? currentUid;
+    debugPrint('PostProvider.fetchMyPosts currentUser.uid=$currentUid');
+    debugPrint(
+      'PostProvider.fetchMyPosts query: posts where ${FirestoreKeys.userId} == $userId',
+    );
+
+    if (userId == null) {
+      _myPosts = [];
+      debugPrint('PostProvider.fetchMyPosts returned 0 posts');
+      return;
+    }
+
+    _myPosts = await _postService.getMyPosts(userId);
+    debugPrint('PostProvider.fetchMyPosts returned ${_myPosts.length} posts');
+  }
+
+  Future<void> _refreshPostsAfterWrite({String? fallbackUserId}) async {
+    try {
+      await _loadPosts();
+      await _loadMyPosts(fallbackUserId: fallbackUserId);
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+  }
+
+  PostModel? _findCachedPost(String postId) {
+    for (final post in [..._posts, ..._myPosts]) {
+      if (post.id == postId) return post;
+    }
+
+    return null;
+  }
+
+  Future<void> _tryDeleteImage(String imageUrl) async {
+    try {
+      await _imageUploadService.deleteImageByUrl(imageUrl);
+    } catch (_) {}
+  }
+
+  String? _currentFirebaseUid() {
+    try {
+      return FirebaseAuth.instance.currentUser?.uid;
+    } catch (_) {
+      return null;
     }
   }
 
