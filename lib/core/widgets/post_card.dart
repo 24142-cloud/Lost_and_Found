@@ -13,212 +13,224 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
+    final AppLocalizations l = AppLocalizations.of(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.07),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _PostImageSection(post: post, l: l),
+
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _PostImage(imageUrl: post.imageUrl, postId: post.id),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                post.title,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 16,
-                                  color: AppColors.text,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            _StatusChip(
-                              label: l.text(post.type),
-                              type: post.type,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          post.description,
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                  /// 📝 TITLE
+                  Text(
+                    post.title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      color: AppColors.text,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  /// 📍 LOCATION
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on_outlined,
+                          color: AppColors.primary, size: 14),
+                      const SizedBox(width: 3),
+                      Expanded(
+                        child: Text(
+                          post.location,
+                          style: theme.textTheme.bodySmall?.copyWith(
                             color: AppColors.subtext,
-                            fontSize: 13.5,
-                            height: 1.35,
+                            fontSize: 12,
                           ),
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                PostCategories.label(l, post.category),
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: AppColors.secondary,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.location_on_outlined,
-                                  color: AppColors.primary,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 4),
-                                Flexible(
-                                  child: Text(
-                                    post.location,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: AppColors.subtext,
-                                      fontSize: 11.5,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  /// 📄 DESCRIPTION (رجعناه)
+                  Text(
+                    post.description,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.subtext,
+                      fontSize: 13,
+                      height: 1.4,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// 🏷 CATEGORY + ACTIONS
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          PostCategories.label(l, post.category),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.share_outlined,
+                                size: 18, color: AppColors.subtext),
+                            onPressed: () {},
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.favorite_border_rounded,
+                                size: 18, color: AppColors.subtext),
+                            onPressed: () {},
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _PostImage extends StatelessWidget {
-  const _PostImage({required this.imageUrl, required this.postId});
+class _PostImageSection extends StatelessWidget {
+  const _PostImageSection({
+    required this.post,
+    required this.l,
+  });
 
-  final String imageUrl;
-  final String postId;
+  final PostModel post;
+  final AppLocalizations l;
 
   @override
   Widget build(BuildContext context) {
-    final decoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: AppColors.border.withValues(alpha: 0.4)),
-    );
-
-    final child = imageUrl.isEmpty
-        ? Container(
-            width: 90,
-            height: 98,
-            decoration: decoration.copyWith(color: const Color(0xFFFAF8F5)),
-            child: const Icon(Icons.image_outlined, color: AppColors.primary, size: 28),
-          )
-        : Container(
-            width: 90,
-            height: 98,
-            decoration: decoration,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: const Color(0xFFFAF8F5),
-                    child: const Icon(
-                      Icons.image_not_supported_outlined,
-                      color: AppColors.primary,
+    return Stack(
+      children: [
+        post.imageUrl.isEmpty
+            ? Container(
+                height: 180,
+                color: const Color(0xFFF0EDE8),
+                child: const Center(
+                  child: Icon(Icons.image_outlined,
+                      color: AppColors.primary, size: 48),
+                ),
+              )
+            : Hero(
+                tag: post.id,
+                child: SizedBox(
+                  height: 180,
+                  width: double.infinity,
+                  child: Image.network(
+                    post.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      height: 180,
+                      color: const Color(0xFFF0EDE8),
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported_outlined,
+                            color: AppColors.primary, size: 40),
+                      ),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
-            ),
-          );
 
-    if (imageUrl.isNotEmpty) {
-      return Hero(tag: postId, child: child);
-    }
-    return child;
+        /// 🔴🟢 STATUS BADGE
+        Positioned(
+          top: 12,
+          right: 12,
+          child: _StatusBadge(type: post.type, l: l),
+        ),
+      ],
+    );
   }
 }
 
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({required this.label, required this.type});
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({
+    required this.type,
+    required this.l,
+  });
 
-  final String label;
   final String type;
+  final AppLocalizations l;
 
   @override
   Widget build(BuildContext context) {
     final isLost = type == 'lost';
-    final bgColor = isLost 
-        ? AppColors.error.withValues(alpha: 0.1) 
-        : AppColors.success.withValues(alpha: 0.1);
-    final textColor = isLost 
-        ? AppColors.error 
-        : AppColors.success;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(30),
+        color: isLost ? AppColors.secondary : AppColors.primary,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Text(
-        label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: textColor,
-          fontWeight: FontWeight.w900,
-          fontSize: 11,
+        l.text(type),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
         ),
       ),
     );
   }
 }
-

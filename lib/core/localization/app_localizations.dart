@@ -16,7 +16,8 @@ class AppLocalizations {
 
   static const _values = {
     'ar': {
-      'appName': 'ضالة',
+      'appName': 'الضالّة',
+      "appSubtitle": "منصة المفقودات والموجودات",
       'splash': 'ضالة',
       'login': 'تسجيل الدخول',
       'register': 'إنشاء حساب',
@@ -97,9 +98,11 @@ class AppLocalizations {
       'french': 'Français',
       'arabic': 'العربية',
       'name': 'الاسم',
+      "dontHaveAccount": "ليس لديك حساب؟"
     },
     'fr': {
       'appName': 'Dalah',
+      "appSubtitle": "Plateforme des objets perdus et trouvés",
       'splash': 'Dalah',
       'login': 'Connexion',
       'register': 'Inscription',
@@ -180,6 +183,8 @@ class AppLocalizations {
       'french': 'Français',
       'arabic': 'العربية',
       'name': 'Nom',
+      "dontHaveAccount": "Vous n'avez pas de compte ?",
+
     },
   };
 

@@ -1,13 +1,36 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const primary = Color(0xFFC99652);
-  static const secondary = Color(0xFFA87432);
-  static const background = Color(0xFFFAF8F5);
+  // Bleu Canard
+  static const primary = Color(0xFF0E6B78);
+
+  // Teal Dark
+  static const secondary = Color(0xFF0A5560);
+
+  // Gold
+  static const accent = Color(0xFFD4B06A);
+
+  // Background
+  static const background = Color(0xFFF8F7F5);
+
+  // Cards
   static const card = Color(0xFFFFFFFF);
-  static const text = Color(0xFF222222);
-  static const subtext = Color(0xFF777777);
-  static const border = Color(0xFFE8DED3);
-  static const success = Color(0xFF3F7D58);
-  static const error = Color(0xFFB24A3A);
+
+  // Text
+  static const text = Color(0xFF1E1E1E);
+
+  // Secondary text
+  static const subtext = Color(0xFF8A8A8A);
+
+  // Border
+  static const border = Color(0xFFEAEAEA);
+
+  // Success
+  static const success = Color(0xFF3FA46A);
+
+  // Error
+  static const error = Color(0xFFE15C4F);
+
+  // Search background
+  static const searchBackground = Color(0xFFF3F4F6);
 }

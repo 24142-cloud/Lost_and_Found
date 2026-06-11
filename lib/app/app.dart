@@ -92,7 +92,7 @@ class MyApp extends StatelessWidget {
                 ),
               ),
               appBarTheme: const AppBarTheme(
-                backgroundColor: AppColors.background,
+                backgroundColor: Colors.white,
                 foregroundColor: AppColors.text,
                 elevation: 0,
                 centerTitle: true,
