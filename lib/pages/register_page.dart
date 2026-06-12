@@ -63,35 +63,75 @@ class _RegisterPageState extends State<RegisterPage> {
     final l = AppLocalizations.of(context);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const SizedBox.shrink(),
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+          color: AppColors.secondary,
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: const [LanguageSwitcher()],
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 10, 24, 32),
+          padding: const EdgeInsets.fromLTRB(24, 4, 24, 40),
           children: [
-            _RegisterTitle(
-              title: l.text('splash'),
-              subtitle: l.text('register'),
+            // ── Header ──────────────────────────────────────────────
+            const SizedBox(height: 4),
+            Directionality(
+              textDirection: TextDirection.rtl,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    l.text('appName'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                          color: AppColors.secondary,
+                          fontSize: 36,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.3,
+                          height: 1.1,
+                        ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    l.text('register'),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: AppColors.subtext,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15,
+                        ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 38),
+
+            // ── Form card ────────────────────────────────────────────
             Container(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               decoration: BoxDecoration(
                 color: AppColors.card,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(
+                  color: AppColors.border.withValues(alpha: 0.6),
+                  width: 1,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 20,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   CustomTextField(
                     controller: _nameController,
@@ -100,7 +140,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     validator: (value) =>
                         Validators.requiredField(value, l.text('required')),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   CustomTextField(
                     controller: _emailController,
                     label: l.text('email'),
@@ -112,7 +152,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       l.text('invalidEmail'),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   CustomTextField(
                     controller: _phoneController,
                     label: l.text('phoneNumber'),
@@ -121,16 +161,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     validator: (value) =>
                         Validators.requiredField(value, l.text('required')),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   CustomTextField(
                     controller: _passwordController,
                     label: l.text('password'),
-                    prefixIcon: Icons.lock_outlined,
+                    prefixIcon: Icons.lock_outline_rounded,
                     obscureText: true,
                     validator: (value) =>
                         Validators.requiredField(value, l.text('required')),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   CustomTextField(
                     controller: _confirmPasswordController,
                     label: l.text('confirmPassword'),
@@ -150,14 +190,14 @@ class _RegisterPageState extends State<RegisterPage> {
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                         fontWeight: FontWeight.w600,
+                        fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ],
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 22),
                   CustomButton(
                     label: l.text('register'),
-                    icon: Icons.person_add_alt_1_rounded,
                     isLoading: authProvider.isLoading,
                     onPressed: _register,
                   ),
@@ -165,66 +205,39 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // ── Footer link ──────────────────────────────────────────
             TextButton(
               onPressed: () => Navigator.pop(context),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.secondary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 10),
               ),
-              child: Text(
-                l.text('alreadyHaveAccount'),
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.subtext,
+                  ),
+                  children: [
+                    TextSpan(text: '${l.text('alreadyHaveAccount')}  '),
+                    TextSpan(
+                      text: l.text('login'),
+                      style: const TextStyle(
+                        color: AppColors.accent,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _RegisterTitle extends StatelessWidget {
-  const _RegisterTitle({required this.title, required this.subtitle});
-
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.person_add_alt_1_rounded,
-            color: AppColors.primary,
-            size: 48,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-            color: AppColors.secondary,
-            fontSize: 40,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 0.5,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          subtitle,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppColors.subtext,
-            fontWeight: FontWeight.w600,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
     );
   }
 }

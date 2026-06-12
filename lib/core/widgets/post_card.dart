@@ -116,14 +116,6 @@ class PostCard extends StatelessWidget {
                       Row(
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.share_outlined,
-                                size: 18, color: AppColors.subtext),
-                            onPressed: () {},
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
                             icon: const Icon(Icons.favorite_border_rounded,
                                 size: 18, color: AppColors.subtext),
                             onPressed: () {},

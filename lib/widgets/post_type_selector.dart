@@ -12,43 +12,115 @@ class PostTypeSelector extends StatelessWidget {
   final String value;
   final ValueChanged<String> onChanged;
 
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
+@override
+Widget build(BuildContext context) {
+  final l = AppLocalizations.of(context);
 
-    return SegmentedButton<String>(
-      style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return AppColors.primary;
-          }
-          return AppColors.card;
-        }),
-        foregroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return Colors.white;
-          return AppColors.text;
-        }),
-        side: WidgetStateProperty.all(
-          const BorderSide(color: AppColors.border),
-        ),
-        shape: WidgetStateProperty.all(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        ),
+  return Container(
+    height: 60,
+    padding: const EdgeInsets.all(5),
+    decoration: BoxDecoration(
+      color: const Color(0xFFF7F5F2),
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(
+        color: AppColors.border.withOpacity(0.7),
       ),
-      segments: [
-        ButtonSegment(
-          value: 'lost',
-          icon: const Icon(Icons.search_rounded),
-          label: Text(l.text('lost')),
+    ),
+    child: Row(
+      children: [
+        _ModernTypeButton(
+          selected: value == 'lost',
+          label: l.text('lost'),
+          icon: Icons.search_rounded,
+          activeColor: const Color(0xFFE15C4F),
+          onTap: () => onChanged('lost'),
         ),
-        ButtonSegment(
-          value: 'found',
-          icon: const Icon(Icons.inventory_2_outlined),
-          label: Text(l.text('found')),
+        const SizedBox(width: 6),
+        _ModernTypeButton(
+          selected: value == 'found',
+          label: l.text('found'),
+          icon: Icons.inventory_2_rounded,
+          activeColor: const Color(0xFF3FA46A),
+          onTap: () => onChanged('found'),
         ),
       ],
-      selected: {value},
-      onSelectionChanged: (values) => onChanged(values.first),
+    ),
+  );
+}
+}
+
+class _ModernTypeButton extends StatelessWidget {
+  const _ModernTypeButton({
+    required this.selected,
+    required this.label,
+    required this.icon,
+    required this.activeColor,
+    required this.onTap,
+  });
+
+  final bool selected;
+  final String label;
+  final IconData icon;
+  final Color activeColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          color: selected ? activeColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: activeColor.withOpacity(0.28),
+                    blurRadius: 16,
+                    offset: const Offset(0, 5),
+                  ),
+                ]
+              : [],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(15),
+            onTap: onTap,
+            child: AnimatedScale(
+              duration: const Duration(milliseconds: 250),
+              scale: selected ? 1.02 : 1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      size: 20,
+                      color: selected
+                          ? Colors.white
+                          : AppColors.subtext,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: selected
+                            ? Colors.white
+                            : AppColors.subtext,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
